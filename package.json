@@ -1,0 +1,16 @@
+{
+    "name"          : "api",
+    "description"   : "Taguchi Client APIs",
+    "homepage"      : "https://github.com/taguchimail/taguchi-commonjs-api",
+    "keywords"      : [], 
+    "author"        : "TaguchiMarketing Pty Ltd",
+    "dependencies"  : {},
+    "repository"  : {
+        "type": "git", 
+        "url": "git://github.com/taguchimail/taguchi-commonjs-api.git"
+    }, 
+    "main"          : "main.js",
+    "version"       : "1.0dev1",
+    "engines"       : ["taguchi"]
+}
+
