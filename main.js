@@ -16,7 +16,7 @@ var http = require("https");
  *     Indicates the organization ID to be used for creation of new objects. 
  *     The username supplied must be authorized to access this organization.
  */
-function Context(hostname, username, password, organization_id) {
+exports.Context = function(hostname, username, password, organization_id) {
 
     this.hostname = hostname;
     this.username = username;
@@ -109,8 +109,8 @@ function Context(hostname, username, password, organization_id) {
             }
             return http.post(qs, null, {headers: headers, body: options.data});
         }
-    }
-}
+    };
+};
 
 /**
  * Base class for TM record types.
@@ -138,7 +138,7 @@ function Record(context, options) {
         var results = JSON.parse(this.context.make_request(this.resource_type,
             "PUT", {record_id: this.backing["id"], data: JSON.stringify(data)}));
         this.backing = results[0];
-    }   
+    };  
 
     /**
      * Creates this record in TaguchiMail database.
@@ -148,7 +148,7 @@ function Record(context, options) {
         var results = JSON.parse(this.context.make_request(this.resource_type, 
             "POST", {data: JSON.stringify(data)}));
         this.backing = results[0];
-    }   
+    };  
 }
 
 /**
@@ -157,47 +157,47 @@ function Record(context, options) {
  * context: Context
  *     Determines the TM instance and organization to which the campaign belongs.
  */
-function Campaign(context) {
+exports.Campaign = function(context) {
 
     this.super = Record;
     this.super(context, {resource_type: "campaign"});
 
     this.record_id = function() {           // id 
         return String(this.backing["id"]); 
-    }
+    };
 
     this.ref = function(value) {            // ref
         if (value == undefined) 
             return String(this.backing["ref"]);
         else 
             this.backing["ref"] = value;
-    }
+    };
 
     this.name = function(value) {           // name
         if (value == undefined) 
             return String(this.backing["name"]);
         else 
             this.backing["name"] = value;
-    }   
+    };  
  
     this.start_datetime = function(value) { // date
         if (value == undefined) 
             return String(this.backing["date"]);
         else 
             this.backing["date"] = value;
-    }   
+    };  
  
     this.xml_data = function(value) {       // data
         if (value == undefined) 
             return String(this.backing["data"]);
         else 
             this.backing["data"] = value;
-    }   
+    };  
  
     this.status = function() {              // status
         return String(this.backing["status"]);
-    }   
-}
+    };  
+};
 
 /**
  * Retrieves a single Campaign based on its TaguchiMail identifier.
@@ -209,13 +209,13 @@ function Campaign(context) {
  * parameters: associative array
  *     Contains additional parameters to the request.
  */
-Campaign.get = function(context, record_id, parameters) {
+exports.Campaign.get = function(context, record_id, parameters) {
     var results = JSON.parse(context.make_request("campaign", "GET",
         {record_id: record_id, parameters: parameters}));
-    var record = new Campaign(context);
+    var record = new exports.Campaign(context);
     record.backing = results[0];
     return record;
-}
+};
 
 /**
  * Retrieves a list of Campaign(s) based on a query.
@@ -258,19 +258,19 @@ Campaign.get = function(context, record_id, parameters) {
  *     * nt: mapped to SQL 'IS NOT', should be used to test for NOT NULL values 
  *       in the database as [field]-neq-null is always false.
  */
-Campaign.find = function(context, sort, order, offset, limit, query) {
+exports.Campaign.find = function(context, sort, order, offset, limit, query) {
     var parameters = {sort: sort, order: order, offset: String(offset),
         limit: String(limit)};
     var results = JSON.parse(context.make_request("campaign", "GET",
         {parameters: parameters, query: query}));
     var records = [];
     for (var i = 0; i < results.length; i++) {
-        var record = new Campaign(context);
+        var record = new exports.Campaign(context);
         record.backing = results[i];
         records.push(record);
     }
     return records;
-}
+};
 
 /**
  * Models a revision of activity in TaguchiMail.
@@ -280,26 +280,26 @@ Campaign.find = function(context, sort, order, offset, limit, query) {
  * revision: associative array
  *     The data backing the record.
  */
-function ActivityRevision(activity, revision) {
+exports.ActivityRevision = function(activity, revision) {
 
     this.activity = activity;
     this.backing = revision || {};
 
     this.record_id = function() {               // id
         return String(this.backing["id"]);
-    }
+    };
    
     this.content = function() {                 // content
         return String(this.backing["content"]);
-    }   
+    };  
 
     this.approval_status = function(value) {    // approval status
         if (value == undefined) 
             return String(this.backing["approval_status"]);
         else 
             this.backing["approval_status"] = value;
-    }
-}
+    };
+};
 
 /**
  * Models an activity in TaguchiMail.
@@ -307,7 +307,7 @@ function ActivityRevision(activity, revision) {
  * context: Context
  *     Determines the TM instance and organization to which the activity belongs.
  */
-function Activity(context) {
+exports.Activity = function(context) {
 
     this.super = Record;
     this.super(context, {resource_type: "activity"});
@@ -315,102 +315,104 @@ function Activity(context) {
 
     this.record_id = function() {               // id
         return String(this.backing["id"]);
-    }   
+    };
 
     this.ref = function(value) {                // ref
         if (value == undefined) 
             return String(this.backing["ref"]);
         else 
             this.backing["ref"] = value;
-    }   
+    };  
 
     this.name = function(value) {               // name
         if (value == undefined) 
             return String(this.backing["name"]);
         else 
             this.backing["name"] = value;
-    }
+    };
 
     this.type = function(value) {               // type
         if (value == undefined) 
             return String(this.backing["type"]);
         else 
             this.backing["type"] = value;
-    }
+    };
 
     this.subtype = function(value) {            // subtype
         if (value == undefined) 
             return String(this.backing["subtype"]);
         else 
             this.backing["subtype"] = value;
-    }
+    };
 
     this.target_lists = function(value) {       // target_list
         if (value == undefined) 
             return String(this.backing["target_lists"]);
          else 
             this.backing["target_lists"] = value;
-    }
+    };
 
     this.target_views = function(value) {       // target_views
         if (value == undefined) 
             return String(this.backing["target_views"]);
         else 
             this.backing["target_views"] = value;
-    }
+    };
 
     this.approval_status = function(value) {    // approval_status
         if (value == undefined) 
             return String(this.backing["approval_status"]);
         else 
             this.backing["approval_status"] = value;
-    }
+    };
 
     this.deploy_datetime = function(value) {    // date
         if (value == undefined)
             return String(this.backing["date"]);
         else
             this.backing["date"] = value;
-    }
+    };
 
     this.template_id = function(value) {        // template_id
         if (value == undefined) 
             return String(this.backing["template_id"]);
         else 
             this.backing["template_id"] = value;
-    }
+    };
 
     this.campaign_id = function(value) {        // campaign_id
         if (value == undefined) 
             return String(this.backing["campaign_id"]);
         else 
             this.backing["campaign_id"] = value;
-    }
+    };
 
     this.throttle = function(value) {           // throttle
         if (value == undefined) 
             return parseInt(this.backing["throttle"]);
         else 
             this.backing["throttle"] = value;
-    }
+    };
 
     this.xml_data = function(value) {           // data
         if (value == undefined) 
             return String(this.backing["data"]);
         else 
             this.backing["data"] = value;
-    }
+    };
 
     this.status = function() {                  // status
         return String(this.backing["status"]);
-    }
+    };
 
     this.latest_revision = function(value) {    // revisions
         if (value == undefined) {
             if (this.backing["revisions"].length > 0) 
-                return new ActivityRevision(this, this.backing["revisions"][0]);
+                return new exports.ActivityRevision(this, 
+                    this.backing["revisions"][0]);
             else if (this.existing_revisions.length > 0) 
-                return new ActivityRevision(this, this.existing_revisions[0]);
+                return new exports.ActivityRevision(this, 
+                    this.existing_revisions[0]);
             else 
                 return null;
         } else { 
@@ -420,7 +422,7 @@ function Activity(context) {
             else 
                 this.backing["revisions"].push(revision);
         }
-    }
+    };
 
     /**
      * Saves this activity to the TagchiMail database.
@@ -430,7 +432,7 @@ function Activity(context) {
         this.update_in_super();
         this.existing_revisions = this.backing["revisions"];
         this.backing["revisions"] = [];
-    }
+    };
 
     /**
      * Creates this activity in the TaguchiMail database.
@@ -440,7 +442,7 @@ function Activity(context) {
         this.create_in_super();
         this.existing_revisions = this.backing["revisions"];
         this.backing["revisions"] = [];
-    }
+    };
 
     /**
      * Sends a proof message for an activity record to the list with the
@@ -463,7 +465,7 @@ function Activity(context) {
         } else {
             this.proof(list.record_id, tag, message);
         }
-    }
+    };
 
     /**
      * Sends an approval request for an activity record to the list with the
@@ -487,7 +489,7 @@ function Activity(context) {
         } else {
             this.request_approval(list.record_id, tag, message);
         }
-    }
+    };
 
     /**
      * Triggers the activity, causing it to be delivered to a specified list of 
@@ -516,8 +518,8 @@ function Activity(context) {
             }
             this.trigger(subscriber_ids, request_content, test);
         }
-    }
-}
+    };
+};
 
 /**
  * Retrieves a single Activity based on its TaguchiMail identifier.
@@ -529,15 +531,15 @@ function Activity(context) {
  * parameters: associative array
  *     Contains additional parameters to the request.
  */
-Activity.get = function(context, record_id, parameters) {
+exports.Activity.get = function(context, record_id, parameters) {
     var results = JSON.parse(context.make_request("activity", "GET",
         {record_id: record_id, parameters: parameters}));
-    var record = new Activity(context);
+    var record = new exports.Activity(context);
     record.backing = results[0];
     record.existing_revisions = record.backing["revisions"];
     record.backing["revisions"] = [];
     return record;
-}
+};
 
 /**
  * Retrieves a single Activity based on its TaguchiMail identifier, with its
@@ -548,9 +550,9 @@ Activity.get = function(context, record_id, parameters) {
  * record_id: string/integer
  *     Contains the list's unique TaguchiMail identifier.
  */
-Activity.get_with_content = function(context, record_id) {
-    return Activity.get(context, record_id, {revision: "latest"});
-}
+exports.Activity.get_with_content = function(context, record_id) {
+    return exports.Activity.get(context, record_id, {revision: "latest"});
+};
 
 /**
  * Retrieves a list of Activity(s) based on a query.
@@ -593,21 +595,21 @@ Activity.get_with_content = function(context, record_id) {
  *     * nt: mapped to SQL 'IS NOT', should be used to test for NOT NULL values 
  *       in the database as [field]-neq-null is always false.
  */
-Activity.find = function(context, sort, order, offset, limit, query) {
+exports.Activity.find = function(context, sort, order, offset, limit, query) {
     var parameters = {sort: sort, order: order, offset: String(offset),
         limit: String(limit)};
     var results = JSON.parse(context.make_request("activity", "GET",
         {parameters: parameters, query: query}));
     var records = [];
     for (var i = 0; i < results.length; i++) {
-        var record = new Activity(context);
+        var record = new exports.Activity(context);
         record.backing = results[i];
         record.existing_revisions = record.backing["revisions"];
         record.backing["revisions"] = [];
         records.push(record);
     }
     return records;
-}
+};
 
 /**
  * Models a revision of template in TaguchiMail.
@@ -617,7 +619,7 @@ Activity.find = function(context, sort, order, offset, limit, query) {
  * revision: associative array
  *     The data backing the record.
  */
-function TemplateRevision(template, format, revision) {
+exports.TemplateRevision = function(template, format, revision) {
     
     this.template = template;
     this.format = format || null;
@@ -625,22 +627,22 @@ function TemplateRevision(template, format, revision) {
 
     this.record_id = function() {       // id
         return String(this.backing["id"]);
-    }
+    };
    
     this.format = function(value) {     // format
         if (value == undefined) 
             return String(this.backing["format"]);
         else 
             this.backing["format"] = value;
-    }   
+    };  
 
     this.content = function(value) {    // content
         if (value == undefined) 
             return String(this.backing["content"]);
         else 
             this.backing["content"] = value;
-    }
-}
+    };
+};
 
 /**
  * Models a template in TaguchiMail.
@@ -648,7 +650,7 @@ function TemplateRevision(template, format, revision) {
  * context: Context
  *     Determines the TM instance and organization to which the template belongs.
  */
-function Template(context) {
+exports.Template = function(context) {
 
     this.super = Record;
     this.super(context, {resource_type: "template"});
@@ -656,53 +658,55 @@ function Template(context) {
 
     this.record_id = function() {       // id
         return String(this.backing["id"]);
-    }   
+    };
 
     this.ref = function(value) {        // ref
         if (value == undefined) 
             return String(this.backing["ref"]);
         else 
             this.backing["ref"] = value;
-    }   
+    };  
 
     this.name = function(value) {       // name
         if (value == undefined) 
             return String(this.backing["name"]);
         else 
             this.backing["name"] = value;
-    }
+    };
 
     this.type = function(value) {       // type
         if (value == undefined) 
             return String(this.backing["type"]);
         else 
             this.backing["type"] = value;
-    }
+    };
 
     this.subtype = function(value) {    // subtype
         if (value == undefined) 
             return String(this.backing["subtype"]);
         else 
             this.backing["subtype"] = value;
-    }
+    };
 
     this.xml_data = function(value) {   // data
         if (value == undefined) 
             return String(this.backing["data"]);
         else
             this.backing["data"] = value;
-    }
+    };
 
     this.status = function() {          // status
         return String(this.backing["status"]);
-    }
+    };
 
     this.latest_revision = function(value) {    // revisions
         if (value == undefined) {
             if (this.backing["revisions"].length > 0) 
-                return new TemplateRevision(this, null, this.backing["revisions"][0]);
+                return new exports.TemplateRevision(this, null, 
+                    this.backing["revisions"][0]);
             else if (this.existing_revisions.length > 0) 
-                return new TemplateRevision(this, null, this.existing_revisions[0]);
+                return new exports.TemplateRevision(this, null, 
+                    this.existing_revisions[0]);
             else 
                 return null;
         } else { 
@@ -712,7 +716,7 @@ function Template(context) {
             else 
                 this.backing["revisions"].push(revision);
         }
-    }
+    };
 
     /**
      * Saves this template to the TaguchiMail database.
@@ -722,7 +726,7 @@ function Template(context) {
         this.update_in_super();
         this.existing_revisions = this.backing["revisions"];
         this.backing["revision"] = [];
-    }
+    };
 
     /**
      * Creates this template in the TaguchiMail database.
@@ -732,8 +736,8 @@ function Template(context) {
         this.create_in_super();
         this.existing_revisions = this.backing["revisions"];
         this.backing["revision"] = [];
-    }
-}
+    };
+};
 
 /**
  * Retrieves a single Template based on its TaguchiMail identifier.
@@ -745,15 +749,15 @@ function Template(context) {
  * parameters: associative array
  *     Contains additional parameters to the request.
  */
-Template.get = function(context, record_id, parameters) {
+exports.Template.get = function(context, record_id, parameters) {
     var results = JSON.parse(context.make_request("template", "GET",
         {record_id: record_id, parameters: parameters}));
-    var record = new Template(context);
+    var record = new exports.Template(context);
     record.backing = results[0];
     record.existing_revisions = record.backing["revisions"];
     record.backing["revisions"] = [];
     return record;
-}
+};
 
 /**
  * Retrieves a single Template based on its TaguchiMail identifier, with its
@@ -764,9 +768,9 @@ Template.get = function(context, record_id, parameters) {
  * record_id: string/integer
  *     Contains the list's unique TaguchiMail identifier.
  */
-Template.get_with_content = function(context, record_id, parameters) {
-    return Template.get(context, record_id, {revision: "latest"});
-}
+exports.Template.get_with_content = function(context, record_id, parameters) {
+    return exports.Template.get(context, record_id, {revision: "latest"});
+};
 
 /**
  * Retrieves a list of Template(s) based on a query.
@@ -809,21 +813,21 @@ Template.get_with_content = function(context, record_id, parameters) {
  *     * nt: mapped to SQL 'IS NOT', should be used to test for NOT NULL values 
  *       in the database as [field]-neq-null is always false.
  */
-Template.find = function(context, sort, order, offset, limit, query) {
+exports.Template.find = function(context, sort, order, offset, limit, query) {
     var parameters = {sort: sort, order: order, offset: String(offset),
         limit: String(limit)};
     var results = JSON.parse(context.make_request("template", "GET",
         {parameters: parameters, query: query}));
     var records = [];
     for (var i = 0; i < results.length; i++) {
-        var record = new Template(context);
+        var record = new exports.Template(context);
         record.backing = results[i];
         record.existing_revisions = record.backing["revisions"];
         record.backing["revisions"] = [];
         records.push(record);
     }
     return records;
-}
+};
 
 /**
  * Models an subscriber in TaguchiMail.
@@ -831,162 +835,162 @@ Template.find = function(context, sort, order, offset, limit, query) {
  * context: Context
  *     Determines the TM instance and organization to which the activity belongs.
  */
-function Subscriber(context) {
+exports.Subscriber = function(context) {
 
     this.super = Record;
     this.super(context, {resource_type: "subscriber"});
 
     this.record_id = function() {                   // id
         return String(this.backing["id"]);
-    }   
+    };
 
     this.ref = function(value) {                    // ref
         if (value == undefined) 
             return String(this.backing["ref"]);
         else 
             this.backing["ref"] = value;
-    }   
+    };  
 
     this.title = function(value) {                  // title
         if (value == undefined) 
             return String(this.backing["title"]);
         else 
             this.backing["title"] = value;
-    }   
+    };  
 
     this.firstname = function(value) {              // firstname
         if (value == undefined) 
             return String(this.backing["firstname"]);
         else 
             this.backing["firstname"] = value;
-    }   
+    };  
 
     this.lastname = function(value) {               // lastname
         if (value == undefined) 
             return String(this.backing["lastname"]);
         else 
             this.backing["lastname"] = value;
-    }   
+    };  
 
     this.notifications = function(value) {          // notifications
         if (value == undefined) 
             return String(this.backing["notifications"]);
         else 
             this.backing["notifications"] = value;
-    }
+    };
 
     this.extra = function(value) {                  // extra
         if (value == undefined) 
             return String(this.backing["extra"]);
         else 
             this.backing["extra"] = value;
-    }
+    };
 
     this.phone = function(value) {                  // phone
         if (value == undefined) 
             return String(this.backing["phone"]);
         else 
             this.backing["phone"] = value;
-    }
+    };
 
     this.dob = function(value) {                    // dob
         if (value == undefined) 
             return String(this.backing["dob"]);
         else 
             this.backing["dob"] = value;
-    }
+    };
 
     this.address = function(value) {                // address
         if (value == undefined) 
             return String(this.backing["address"]);
         else 
             this.backing["address"] = value;
-    }
+    };
 
     this.address2 = function(value) {               // address2
         if (value == undefined) 
             return String(this.backing["address2"]);
         else 
             this.backing["address2"] = value;
-    }
+    };
 
     this.address3 = function(value) {               // address3
         if (value == undefined) 
             return String(this.backing["address3"]);
         else 
             this.backing["address3"] = value;
-    }
+    };
 
     this.suburb = function(value) {                 // suburb
         if (value == undefined) 
             return String(this.backing["suburb"]);
         else 
             this.backing["suburb"] = value;
-    }
+    };
 
     this.state = function(value) {                  // state
         if (value == undefined) 
             return String(this.backing["state"]);
         else 
             this.backing["state"] = value;
-    }
+    };
 
     this.country = function(value) {                // country
         if (value == undefined) 
             return String(this.backing["country"]);
         else 
             this.backing["country"] = value;
-    }
+    };
 
     this.postcode = function(value) {               // postcode
         if (value == undefined) 
             return String(this.backing["postcode"]);
         else 
             this.backing["postcode"] = value;
-    }
+    };
 
     this.gender = function(value) {                 // gender
         if (value == undefined) 
             return String(this.backing["gender"]);
         else 
             this.backing["gender"] = value;
-    }
+    };
 
     this.email = function(value) {                  // email
         if (value == undefined) 
             return String(this.backing["email"]);
         else 
             this.backing["email"] = value;
-    }
+    };
 
     this.social_rating = function() {               // social_rating
         return String(this.backing["social_rating"]);
-    }
+    };
 
     this.social_profile = function() {              // social_profile
         return String(this.backing["social_profile"]);
-    }
+    };
 
     this.unsubscribe_datetime = function(value) {   // unsubscribed
         if (value == undefined) 
             return String(this.backing["unsubscribed"]);
         else 
             this.backing["unsubscribed"] = value;
-    }
+    };
 
     this.bounce_datetime = function(value) {        // bounced
         if (value == undefined) 
             return String(this.backing["bounced"]);
         else 
             this.backing["bounced"] = value;
-    }
+    };
 
     this.xml_data = function(value) {               // data
         if (value == undefined) 
             return String(this.backing["data"]);
         else 
             this.backing["data"] = value;
-    }
+    };
 
     /**
      * Retrieves a custom field value by field name.
@@ -1003,7 +1007,7 @@ function Subscriber(context) {
                 return String(field_data["data"]);
         }
         return null;
-    }
+    };
 
     /**
      * Sets a custom field value by field.
@@ -1028,7 +1032,7 @@ function Subscriber(context) {
             }
         }
         this.backing["custom_fields"].push({field: field, data: data});
-    }
+    };
 
     /**
      * Checks the subscription status of a specific list.
@@ -1049,7 +1053,7 @@ function Subscriber(context) {
         } else {
             return this.is_subscribed_to_list(list.record_id());
         }
-    }
+    };
 
     /**
      * Retrieves the subscription option (arbitrary application data) for a
@@ -1071,7 +1075,7 @@ function Subscriber(context) {
         } else {
             return this.get_subscription_option(list.record_id());
         }
-    }
+    };
 
     /**
      * Checks the unsubscription status of a specific list.
@@ -1092,7 +1096,7 @@ function Subscriber(context) {
         } else {
             return this.is_unsubscribed_from_list(list.record_id());
         }
-    }
+    };
 
     /**
      * Retrieves all list ids to which this record is subscribed.
@@ -1107,7 +1111,7 @@ function Subscriber(context) {
                 lists.push(String(list["list_id"]));
         }
         return lists;
-    }
+    };
 
     /**
      * Retrieves all list (SubscriberList) to which this record is subscribed.
@@ -1117,10 +1121,10 @@ function Subscriber(context) {
         var lists = [];
         for (var i = 0; i < this.list_ids.length; i++) {
             var list_id = this.list_ids[i];
-            lists.push(SubscriberList.get(this.context, list_id, null));
+            lists.push(exports.SubscriberList.get(this.context, list_id, null));
         }
         return lists;
-    }
+    };
 
     /**
      * Retrieves all list ids to which this record is unsubscribed.
@@ -1135,7 +1139,7 @@ function Subscriber(context) {
                 lists.push(String(list["list_id"]));
         }
         return lists;
-    }
+    };
 
     /**
      * Retrieves all list (SubscriberList) to which this record is unsubscribed.
@@ -1145,10 +1149,10 @@ function Subscriber(context) {
         var lists = [];
         for (var i = 0; i < this.list_ids.length; i++) {
             var list_id = this.list_ids[i];
-            lists.push(SubscriberList.get(this.context, list_id, null));
+            lists.push(exports.SubscriberList.get(this.context, list_id, null));
         }
         return lists;
-    }
+    };
 
     /**
      * Adds the subscriber to a specific list, resetting the unsubscribe flag if
@@ -1175,7 +1179,7 @@ function Subscriber(context) {
         } else {
             return this.subscribe_to_list(list.record_id(), option);
         }
-    }
+    };
 
     /**
      * Unsubscribe from a specific list, adding the list if not already 
@@ -1202,7 +1206,7 @@ function Subscriber(context) {
         } else {
             return this.unsubscribe_from_list(list.record_id());
         }
-    }
+    };
 
     /**
      * Creates this record in the TaguchiMail database if it doesn't already
@@ -1216,8 +1220,8 @@ function Subscriber(context) {
         var results = JSON.parse(this.context.make_request(this.resource_type,
             "CREATEORUPDATE", {data: JSON.stringify(data)}));
         this.backing = results[0];
-    }
-}
+    };
+};
 
 /**
  * Retrieves a single Subscriber based on its TaguchiMail identifier.
@@ -1229,13 +1233,13 @@ function Subscriber(context) {
  * parameters: associative array
  *     Contains additional parameters to the request.
  */
-Subscriber.get = function(context, record_id, parameters) {
+exports.Subscriber.get = function(context, record_id, parameters) {
     var results = JSON.parse(context.make_request("subscriber", "GET",
         {record_id: record_id, parameters: parameters}));
-    var record = new Subscriber(context);
+    var record = new exports.Subscriber(context);
     record.backing = results[0];
     return record;
-}
+};
 
 /**
  * Retrieves a list of Subscriber(s) based on a query.
@@ -1278,19 +1282,19 @@ Subscriber.get = function(context, record_id, parameters) {
  *     * nt: mapped to SQL 'IS NOT', should be used to test for NOT NULL values 
  *       in the database as [field]-neq-null is always false.
  */
-Subscriber.find = function(context, sort, order, offset, limit, query) {
+exports.Subscriber.find = function(context, sort, order, offset, limit, query) {
     var parameters = {sort: sort, order: order, offset: String(offset),
         limit: String(limit)};
     var results = JSON.parse(context.make_request("subscriber", "GET",
         {parameters: parameters, query: query}));
     var records = [];
     for (var i = 0; i < results.length; i++) {
-        var record = new Subscriber(context);
+        var record = new exports.Subscriber(context);
         record.backing = results[i];
         records.push(record);
     }
     return records;
-}
+};
 
 /**
  * Models an subscriber list in TaguchiMail.
@@ -1298,50 +1302,50 @@ Subscriber.find = function(context, sort, order, offset, limit, query) {
  * context: Context
  *     Determines the TM instance and organization to which the activity belongs.
  */
-function SubscriberList(context) {
+exports.SubscriberList = function(context) {
 
     this.super = Record;
     this.super(context, {resource_type: "list"});
 
     this.record_id = function() {           // id
         return String(this.backing["id"]);
-    }
+    };
 
     this.ref = function(value) {            // ref
         if (value == undefined) 
             return String(this.backing["ref"]);
         else 
             this.backing["ref"] = value;
-    }
+    };
 
     this.name = function(value) {           // name
         if (value == undefined) 
             return String(this.backing["name"]);
         else 
             this.backing["name"] = value;
-    }
+    };
 
     this.type = function(value) {           // type
         if (value == undefined) 
             return String(this.backing["type"]);
         else 
             this.backing["type"] = value;
-    }
+    };
 
     this.creation_datetime = function() {   // timestamp
         return String(this.backing["timestamp"]);
-    }
+    };
 
     this.xml_data = function(value) {       // data
         if (value == undefined) 
             return String(this.backing["data"]);
         else 
             this.backing["data"] = value;
-    }
+    };
 
     this.status = function() {              // status
         return String(this.backing["status"]);
-    }
+    };
 
     /**
      * Adds a subscriber to this list with an application-defined subscription 
@@ -1353,8 +1357,8 @@ function SubscriberList(context) {
      *     A subscription option.
      */
     this.subscribe_subscriber = function(subscriber, option) {
-        subscriber.subscribe_to_list(this, option)
-    }
+        subscriber.subscribe_to_list(this, option);
+    };
 
     /**
      * Unsubscribes a subscriber from this list (adding it first if necessary).
@@ -1363,18 +1367,18 @@ function SubscriberList(context) {
      *     A subscriber to unsubscribe.
      */
     this.unsubscribe_subscriber = function(subscriber) {
-        subscriber.unsubscribe_from_list(this)
-    }
+        subscriber.unsubscribe_from_list(this);
+    };
 
     /**
      * Retrieves (limit) subscribers to this list (regardless of opt-in/opt-out 
      * status), starting with the (offset)th subscriber.
      */
     this.get_subscribers = function(offset, limit) {
-        return Subscriber.find(this.context, "id", "asc", offset, limit,
-            ["list_id-eq-" + this.record_id])
-    }
-}
+        return exports.Subscriber.find(this.context, "id", "asc", offset, limit,
+            ["list_id-eq-" + this.record_id]);
+    };
+};
 
 /**
  * Retrieves a single SubscriberList based on its TaguchiMail identifier.
@@ -1386,13 +1390,13 @@ function SubscriberList(context) {
  * parameters: associative array
  *     Contains additional parameters to the request.
  */
-SubscriberList.get = function(context, record_id, parameters) {
+exports.SubscriberList.get = function(context, record_id, parameters) {
     var results = JSON.parse(context.make_request("list", "GET",
         {record_id: record_id, parameters: parameters}));
-    var record = new SubscriberList(context);
+    var record = new exports.SubscriberList(context);
     record.backing = results[0];
     return record;
-}
+};
 
 /**
  * Retrieves a list of SubscriberList(s) based on a query.
@@ -1435,16 +1439,16 @@ SubscriberList.get = function(context, record_id, parameters) {
  *     * nt: mapped to SQL 'IS NOT', should be used to test for NOT NULL values 
  *       in the database as [field]-neq-null is always false.
  */
-SubscriberList.find = function(context, sort, order, offset, limit, query) {
+exports.SubscriberList.find = function(context, sort, order, offset, limit, query) {
     var parameters = {sort: sort, order: order, offset: String(offset),
         limit: String(limit)};
     var results = JSON.parse(context.make_request("list", "GET",
         {parameters: parameters, query: query}));
     var records = [];
     for (var i = 0; i < results.length; i++) {
-        var record = new Subscriber(context);
+        var record = new exports.Subscriber(context);
         record.backing = results[i];
         records.push(record);
     }
     return records;
-}
+};
