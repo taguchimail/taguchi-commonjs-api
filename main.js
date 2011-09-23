@@ -83,16 +83,16 @@ exports.Context = function(hostname, username, password, organization_id) {
         var qs = "https://" + this.hostname + "/admin/api/";
         qs += this.organization_id + "/" + resource + "/";
         qs += (options.record_id == null) ? "": options.record_id;
-        qs += "?_method=" + command;
-        qs += "&auth=" + this.username + "|" + this.password;
+        qs += "?_method=" + escape(command);
+        qs += "&auth=" + escape(this.username + "|" + this.password);
         if (options.query != null) {
             for (var i = 0; i < options.query.length; i++) {
-                qs += "&query=" + options.query[i];
+                qs += "&query=" + escape(options.query[i]);
             }   
         }   
         if (options.parameters != null) {
             for (var key in options.parameters) {
-                qs += "&" + key + "=" + options.parameters[key];
+                qs += "&" + escape(key) + "=" + escape(options.parameters[key]);
             }   
         }
         qs = encodeURI(qs); 
@@ -122,7 +122,7 @@ exports.Context = function(hostname, username, password, organization_id) {
  * options.backing: associative array
  *     The data backing the record.
  */
-function Record(context, options) {
+Record = function(context, options) {
     if (options.resource_type == undefined) options.resource_type = null;
     if (options.backing == undefined) options.backing = {};
 
@@ -149,7 +149,7 @@ function Record(context, options) {
             "POST", {data: JSON.stringify(data)}));
         this.backing = results[0];
     };  
-}
+};
 
 /**
  * Models a campaign in TaguchiMail.
