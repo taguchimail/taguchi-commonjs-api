@@ -416,7 +416,7 @@ exports.Activity = function(context) {
             else 
                 return null;
         } else { 
-            var revision = {content: value.content};
+            var revision = {content: value.content()};
             if (this.backing["revisions"].length > 0) 
                 this.backing["revisions"][0] = revision;
             else 
@@ -619,10 +619,9 @@ exports.Activity.find = function(context, sort, order, offset, limit, query) {
  * revision: associative array
  *     The data backing the record.
  */
-exports.TemplateRevision = function(template, format, revision) {
+exports.TemplateRevision = function(template, revision) {
     
     this.template = template;
-    this.format = format || null;
     this.backing = revision || {};
 
     this.record_id = function() {       // id
@@ -656,61 +655,61 @@ exports.Template = function(context) {
     this.super(context, {resource_type: "template"});
     this.existing_revisions = []; 
 
-    this.record_id = function() {       // id
+    this.record_id = function() {               // id
         return String(this.backing["id"]);
     };
 
-    this.ref = function(value) {        // ref
+    this.ref = function(value) {                // ref
         if (value == undefined) 
             return String(this.backing["ref"]);
         else 
             this.backing["ref"] = value;
     };  
 
-    this.name = function(value) {       // name
+    this.name = function(value) {               // name
         if (value == undefined) 
             return String(this.backing["name"]);
         else 
             this.backing["name"] = value;
     };
 
-    this.type = function(value) {       // type
+    this.type = function(value) {               // type
         if (value == undefined) 
             return String(this.backing["type"]);
         else 
             this.backing["type"] = value;
     };
 
-    this.subtype = function(value) {    // subtype
+    this.subtype = function(value) {            // subtype
         if (value == undefined) 
             return String(this.backing["subtype"]);
         else 
             this.backing["subtype"] = value;
     };
 
-    this.xml_data = function(value) {   // data
+    this.xml_data = function(value) {           // data
         if (value == undefined) 
             return String(this.backing["data"]);
         else
             this.backing["data"] = value;
     };
 
-    this.status = function() {          // status
+    this.status = function() {                  // status
         return String(this.backing["status"]);
     };
 
     this.latest_revision = function(value) {    // revisions
         if (value == undefined) {
             if (this.backing["revisions"].length > 0) 
-                return new exports.TemplateRevision(this, null, 
+                return new exports.TemplateRevision(this, 
                     this.backing["revisions"][0]);
             else if (this.existing_revisions.length > 0) 
-                return new exports.TemplateRevision(this, null, 
+                return new exports.TemplateRevision(this,
                     this.existing_revisions[0]);
             else 
                 return null;
         } else { 
-            var revision = {content: value.content, format: value.format};
+            var revision = {content: value.content(), format: value.format()};
             if (this.backing["revisions"].length > 0) 
                 this.backing["revisions"][0] = revision;
             else 
